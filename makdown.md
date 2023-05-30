@@ -4,3 +4,4 @@ envirogen/
     bot.py
     obstacle.py
     plant.py
+    setup.py
