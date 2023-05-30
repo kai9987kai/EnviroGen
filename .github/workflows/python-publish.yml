@@ -10,7 +10,7 @@ name: EnviroGen
 
 on:
   release: 0.0.1
-    types: [published]
+    types: published
 
 permissions:
   contents: read
