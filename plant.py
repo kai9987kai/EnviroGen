@@ -1,7 +1,5 @@
-from tkinter import Canvas
-
 class Plant:
-    def __init__(self, canvas: Canvas, x: int, y: int, energy: int = 100):
+    def __init__(self, canvas: tk.Canvas, x: int, y: int, energy: int = 100):
         self.canvas = canvas
         self.x = x
         self.y = y
