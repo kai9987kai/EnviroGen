@@ -1,7 +1,5 @@
-from tkinter import Canvas
-
 class Obstacle:
-    def __init__(self, canvas: Canvas, x: int, y: int, size: int):
+    def __init__(self, canvas: tk.Canvas, x: int, y: int, size: int):
         self.canvas = canvas
         self.x = x
         self.y = y
