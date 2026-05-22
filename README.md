@@ -1,68 +1,86 @@
-# EnviroGen Python Package Documentation
+# EnviroGen
 
-## Overview
+EnviroGen is a lightweight Python agent-based ecosystem simulator. It models
+bots, plants, obstacles, local sensing, energy, plant growth, feeding, death,
+reproduction, mutation, metrics, and repeatable experiments.
 
-EnviroGen is a Python package that allows users to create 2D environments with bots, obstacles, and plants using a Tkinter canvas. The bots can move around the environment, interact with obstacles and plants, and have health attributes. Obstacles have a size attribute and plants have an energy attribute and can grow.
+The simulation core is headless and deterministic with a seed. Tkinter is used
+only for the optional demo app.
 
-## Installation
+## Install
 
-To install the EnviroGen package, use pip:
-
+```bash
+pip install -e .
 ```
-pip install envirogen
+
+For development:
+
+```bash
+pip install -e ".[dev]"
+pytest
 ```
 
-## Usage
-
-Here's a basic example of how to use the EnviroGen package:
+## Quickstart
 
 ```python
-import tkinter as tk
-from envirogen import Environment, Bot, Obstacle, Plant
+from envirogen import Bot, Environment, Obstacle, Plant
 
-# Create a Tkinter window and canvas
-window = tk.Tk()
-canvas = tk.Canvas(window, width=800, height=600)
-canvas.pack()
+env = Environment(width=800, height=600, seed=42)
 
-# Create an environment
-env = Environment(window, canvas)
+for index in range(12):
+    env.add_bot(Bot(x=80 + index * 10, y=80, policy="survival"))
 
-# Add bots, obstacles, and plants to the environment
-for _ in range(5):
-    bot = Bot(canvas, x=100, y=100)
-    env.add_bot(bot)
+for index in range(60):
+    env.add_plant(Plant(x=40 + index * 10, y=300, growth_rate=1.2))
 
-for _ in range(3):
-    obstacle = Obstacle(canvas, x=200, y=200, size=50)
-    env.add_obstacle(obstacle)
+env.add_obstacle(Obstacle(x=350, y=220, width=90, height=70))
 
-for _ in range(3):
-    plant = Plant(canvas, x=300, y=300)
-    env.add_plant(plant)
-
-# Start the simulation
-env.run()
+history = env.run(steps=250)
+print(history[-1])
 ```
 
-In this example, we first create a Tkinter window and canvas. We then create an environment and add bots, obstacles, and plants to it. Finally, we start the simulation by calling the `run` method of the `Environment` instance.
+## Tkinter App
 
-## Classes
+```python
+from envirogen import EnviroGenApp, Environment
 
-### Environment
+app = EnviroGenApp(Environment(width=800, height=600, seed=7))
+app.run()
+```
 
-The `Environment` class represents the environment in which the bots, obstacles, and plants exist. It has methods for adding bots, obstacles, and plants to the environment, updating the environment, and running the simulation.
+The app includes start, pause, single-step, reset, speed control, click-to-place
+tools, entity inspection, live counters, and a Resources panel that opens
+external learning links.
 
-### Bot
+## Experiments
 
-The `Bot` class represents a bot. It has an `x` and `y` attribute representing its position in the environment, a `health` attribute, a `move` method for changing its position, and a `take_damage` method for reducing its health.
+```python
+from envirogen import example_scenarios, export_metrics_csv, run_batch
 
-### Obstacle
+scenario = example_scenarios()["stable_ecosystem"]
+rows = run_batch(
+    scenario,
+    seeds=[1, 2, 3],
+    parameter_grid={"plant_growth_rate": [0.5, 1.0, 1.5]},
+)
+export_metrics_csv("results/stable_growth_sweep.csv", rows)
+```
 
-The `Obstacle` class represents an obstacle. It has an `x` and `y` attribute representing its position in the environment, and a `size` attribute.
+See [docs/experiments.md](docs/experiments.md) for the built-in scenarios and
+metrics.
 
-### Plant
+## Resource Catalog
 
-The `Plant` class represents a plant. It has an `x` and `y` attribute representing its position in the environment, an `energy` attribute, and a `grow` method for increasing its energy.
+See [docs/resources.md](docs/resources.md) for curated videos, courses,
+tutorials, examples, and research references covering agent-based modeling,
+Mesa, NetLogo, artificial life, ecology simulation, experiments, optimization,
+and visualization. EnviroGen links to external resources; it does not bundle
+video assets.
 
-Please note that this is a very basic package and you may need to add more functionality to meet your specific needs. For example, you might want to add methods for bots to interact with obstacles and plants, or for plants to be eaten by bots. You might also want to add checks to ensure that bots, obstacles, and plants stay within the bounds of the canvas.
+## Release Security
+
+The previous publish workflow contained a hard-coded PyPI credential expression.
+That credential must be revoked in PyPI outside this repository. The workflow now
+uses PyPI trusted publishing via GitHub Actions OIDC instead of storing a token in
+the repo.
+
